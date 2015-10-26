@@ -219,7 +219,7 @@ func (d *Driver) Create() error {
 	distributionId := d.DistributionId
 
 	log.Debug("Create disk")
-	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Ubuntu Disk", 24576-256, args)
+	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 24576-256, args)
 
 	if err != nil {
 		return err
@@ -266,7 +266,7 @@ func (d *Driver) Create() error {
 		return err
 	}
 
-	log.Debugf("Linode configuration created :%d.", jobId)
+	log.Debugf("Linode configuration created.")
 
 	// Boot
 	log.Debug("Booting")
@@ -282,14 +282,10 @@ func (d *Driver) Create() error {
 		return err
 	}
 
-	log.Infof("Waiting for Machine Running...")
+	log.Debug("Waiting for Machine Running...")
 	if err := mcnutils.WaitForSpecific(drivers.MachineInState(d, state.Running), 120, 3*time.Second); err != nil {
 		return fmt.Errorf("wait for machine running failed: %s", err)
 	}
-
-	// sleep for 10 seconds.
-	// This is required as Linode takes some time to respond to SSH
-	time.Sleep(10 * time.Second)
 
 	return nil
 }
@@ -380,11 +376,11 @@ func (d *Driver) createSSHKey() (string, error) {
 	return string(publicKey), nil
 }
 
-// waitForJob checks job status every 1/2 seconds until timeout
+// waitForJob checks job status every 1 second until timeout
 func (d *Driver) waitForJob(jobId int, jobName string, timeOutSeconds int) error {
 	log.Debugf("Wait for job %s completion...", jobName)
 	timeout := time.After(time.Duration(timeOutSeconds) * time.Second)
-	tick := time.Tick(500 * time.Millisecond)
+	tick := time.Tick(1000 * time.Millisecond)
 	for {
 		select {
 		case <-timeout:
@@ -413,26 +409,4 @@ func (d *Driver) waitForJob(jobId int, jobName string, timeOutSeconds int) error
 // publicSSHKeyPath is always SSH Key Path appended with ".pub"
 func (d *Driver) publicSSHKeyPath() string {
 	return d.GetSSHKeyPath() + ".pub"
-}
-
-// waitForSSHFunc executes SSH command
-func (d *Driver) waitForSSHFunc(command string) func() (bool, error) {
-	return func() (bool, error) {
-		auth := ssh.Auth{
-			Passwords: []string{d.RootPassword},
-		}
-		ip, err := d.GetIP()
-		if err != nil {
-			return false, err
-		}
-		sshClient, err := ssh.NewClient(d.GetSSHUsername(), ip, d.SSHPort, &auth)
-		if err != nil {
-			return false, err
-		}
-		_, err = sshClient.Output(command)
-		if err == nil {
-			return true, nil
-		}
-		return false, err
-	}
 }
