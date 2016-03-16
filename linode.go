@@ -125,6 +125,12 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			Usage:  "Linode Kernel Id",
 			Value:  226, // default kernel, Latest 64 bit (4.1.5-x86_64-linode61),
 		},
+		mcnflag.IntFlag{
+			EnvVar: "LINODE_DOCKER_PORT",
+			Name:   "linode-docker-port",
+			Usage:  "Docker Port",
+			Value:  2375,
+		},
 	}
 }
 
@@ -146,6 +152,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.DistributionId = flags.Int("linode-distribution-id")
 	d.KernelId = flags.Int("linode-kernel-id")
 	d.LinodeLabel = flags.String("linode-label")
+	d.DockerPort = flags.Int("linode-docker-port")
 
 	if d.APIKey == "" {
 		return fmt.Errorf("linode driver requires the --linode-api-key option")
