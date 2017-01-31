@@ -117,19 +117,19 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: "LINODE_DISTRIBUTION_ID",
 			Name:   "linode-distribution-id",
 			Usage:  "Linode Distribution Id",
-			Value:  124, // Ubuntu 14.04 LTS
+			Value:  140, // Debian 8 (Ubuntu 16.04 LTD = 146)
 		},
 		mcnflag.IntFlag{
 			EnvVar: "LINODE_KERNEL_ID",
 			Name:   "linode-kernel-id",
 			Usage:  "Linode Kernel Id",
-			Value:  226, // default kernel, Latest 64 bit (4.1.5-x86_64-linode61),
+			Value:  210, // default kernel, GRUB 2,
 		},
 		mcnflag.IntFlag{
 			EnvVar: "LINODE_DOCKER_PORT",
 			Name:   "linode-docker-port",
 			Usage:  "Docker Port",
-			Value:  2375,
+			Value:  2376,
 		},
 	}
 }
