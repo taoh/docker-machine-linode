@@ -129,7 +129,7 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: "LINODE_DOCKER_PORT",
 			Name:   "linode-docker-port",
 			Usage:  "Docker Port",
-			Value:  2375,
+			Value:  2376,
 		},
 	}
 }
