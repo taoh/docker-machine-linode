@@ -226,7 +226,7 @@ func (d *Driver) Create() error {
 	distributionId := d.DistributionId
 
 	log.Debug("Create disk")
-	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 24576-256, args)
+	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 20480-256, args)
 
 	if err != nil {
 		return err
