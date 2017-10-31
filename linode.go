@@ -117,13 +117,13 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: "LINODE_DISTRIBUTION_ID",
 			Name:   "linode-distribution-id",
 			Usage:  "Linode Distribution Id",
-			Value:  124, // Ubuntu 14.04 LTS
+			Value:  146, // Ubuntu 16.04 LTS
 		},
 		mcnflag.IntFlag{
 			EnvVar: "LINODE_KERNEL_ID",
 			Name:   "linode-kernel-id",
 			Usage:  "Linode Kernel Id",
-			Value:  226, // default kernel, Latest 64 bit (4.1.5-x86_64-linode61),
+			Value:  210, // GRUB2
 		},
 		mcnflag.IntFlag{
 			EnvVar: "LINODE_DOCKER_PORT",
@@ -226,7 +226,7 @@ func (d *Driver) Create() error {
 	distributionId := d.DistributionId
 
 	log.Debug("Create disk")
-	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 24576-256, args)
+	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 24576-1024, args)
 
 	if err != nil {
 		return err
@@ -237,14 +237,14 @@ func (d *Driver) Create() error {
 	log.Debugf("Linode create disk task :%d.", jobId)
 
 	// wait until the creation is finished
-	err = d.waitForJob(jobId, "Create Disk Task", 60)
+	err = d.waitForJob(jobId, "Create Disk Task", 120)
 	if err != nil {
 		return err
 	}
 
 	// create swap
 	log.Debug("Create swap disk")
-	createDiskJobResponse, err = d.client.Disk.Create(d.LinodeId, "swap", "Swap Disk", 256, nil)
+	createDiskJobResponse, err = d.client.Disk.Create(d.LinodeId, "swap", "Swap Disk", 1024, nil)
 	if err != nil {
 		return err
 	}
@@ -254,7 +254,7 @@ func (d *Driver) Create() error {
 	log.Debugf("Linode create swap disk task :%d.", jobId)
 
 	// wait until the creation is finished
-	err = d.waitForJob(jobId, "Create Swap Disk Task", 60)
+	err = d.waitForJob(jobId, "Create Swap Disk Task", 120)
 	if err != nil {
 		return err
 	}
@@ -284,13 +284,13 @@ func (d *Driver) Create() error {
 	jobId = jobResponse.JobId.JobId
 	log.Debugf("Booting linode, job id: %v", jobId)
 	// wait for boot
-	err = d.waitForJob(jobId, "Booting linode", 60)
+	err = d.waitForJob(jobId, "Booting linode", 180)
 	if err != nil {
 		return err
 	}
 
 	log.Debug("Waiting for Machine Running...")
-	if err := mcnutils.WaitForSpecific(drivers.MachineInState(d, state.Running), 120, 3*time.Second); err != nil {
+	if err := mcnutils.WaitForSpecific(drivers.MachineInState(d, state.Running), 180, 5*time.Second); err != nil {
 		return fmt.Errorf("wait for machine running failed: %s", err)
 	}
 
