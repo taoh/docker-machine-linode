@@ -123,13 +123,13 @@ func (d *Driver) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: "LINODE_KERNEL_ID",
 			Name:   "linode-kernel-id",
 			Usage:  "Linode Kernel Id",
-			Value:  210, // GRUB2
+			Value:  210, // default kernel, GRUB 2,
 		},
 		mcnflag.IntFlag{
 			EnvVar: "LINODE_DOCKER_PORT",
 			Name:   "linode-docker-port",
 			Usage:  "Docker Port",
-			Value:  2375,
+			Value:  2376,
 		},
 	}
 }
@@ -226,7 +226,7 @@ func (d *Driver) Create() error {
 	distributionId := d.DistributionId
 
 	log.Debug("Create disk")
-	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 24576-1024, args)
+	createDiskJobResponse, err := d.client.Disk.CreateFromDistribution(distributionId, d.LinodeId, "Primary Disk", 20480-256, args)
 
 	if err != nil {
 		return err
