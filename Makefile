@@ -9,5 +9,6 @@ build: clean
 
 install: build
 	cp ./bin/docker-machine-driver-linode $(GOPATH)/bin/
+	cp ./bin/docker-machine-driver-linode $(HOME)/bin/
 	
 .PHONY: build install
